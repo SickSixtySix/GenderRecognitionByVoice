@@ -101,7 +101,7 @@ end
 train_input_3 = train_input_3(:,1:17);
 test_input_3 = test_input_3(:,1:17);
 
-% STEP #6.5
+% STEP #6.1
 
 % Prepare the train dataset
 train = {
@@ -173,4 +173,30 @@ for i=1:3
     glm_metrics(i,1) = (tp + tn) / (tp + tn + fp + fn);
     glm_metrics(i,2) = tp / (tp + fp);
     glm_metrics(i,3) = tp / (tp + fn);
+end
+
+% STEP #9 (SVM)
+
+% Train the model
+svm = cell(1,3);
+for i=1:3
+    if i==3
+        svm{i} = fitcsvm(train{i},train_label,'Standardize',true);
+    else
+        svm{i} = fitcsvm(train{i},train_label);
+    end
+end
+
+% Assess the model
+svm_metrics = zeros(3,3);
+for i=1:3
+    prediction = predict(svm{i},test{i});
+    cm = confusionmat(test_label,prediction);
+    tp = cm(1,1);
+    tn = cm(2,2);
+    fp = cm(1,2);
+    fn = cm(2,1);
+    svm_metrics(i,1) = (tp + tn) / (tp + tn + fp + fn);
+    svm_metrics(i,2) = tp / (tp + fp);
+    svm_metrics(i,3) = tp / (tp + fn);
 end
